@@ -1,6 +1,7 @@
 """
 Artificial Intelligence to play Hanabi.
 """
+from random import randint
 
 class AI:
     """
@@ -117,4 +118,36 @@ class Cheater(AI):
         act = 'd%d'%myprecious[0][1]
         print('Cheater is doomed and must discard:', act, myprecious)
         return act
+
+
+class RandomPlaying(AI):
+    """
+    this player does things randomly (without cheating!)
+
+    """
+    def play(self):
+        """
+        return a random action
+        """
+        game=self.game
+
+        #choosing a random action
+
+        acts=['d','p','c','x','l']
+        do=random.choice(acts)
+        
+        if (do=='p'):
+            
+        #choosing a random card from your hand
+        i=randint(1,5)
+        card=game.current_hand.cards[i][0]
+
+
+
+        if game.blue_coins<8
+        pass
+
+
+
+
 
