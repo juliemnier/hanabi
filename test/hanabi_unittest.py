@@ -6,6 +6,7 @@ import hanabi
 class ColorTest(unittest.TestCase):
     def test_str(self):
         colors=[(31,"Red"),(32,"Green"),(34,"Blue"),(33,"Yellow"),(37,"White")]
+        trouve=True
         for (c,color) in colors:
             a=str(hanabi.deck.Color(c))
             self.assertEqual(a,color)
