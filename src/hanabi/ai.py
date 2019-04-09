@@ -38,7 +38,7 @@ class Cheater(AI):
             else: print()
 
             return "p%d"%playable[0][0]
-            
+
 
         discardable = [ i+1 for (i,card) in
                         enumerate(game.current_hand.cards)
@@ -48,7 +48,7 @@ class Cheater(AI):
         # discard already played cards, doubles in my hand
         # fixme: discard doubles, if I see it in partner's hand
         # fixme: il me manque les cartes sup d'une pile morte
-        
+
         if discardable and (game.blue_coins<8):
             print ('Cheater would discard:', "d%d"%discardable[0], discardable)
             return "d%d"%discardable[0]
@@ -161,3 +161,13 @@ class RandomPlaying(AI):
 
 
 
+class MeilleureAI(AI):
+    """
+    this player plays like we would play
+    """
+
+    def play(self):
+        """
+        return the best action possible
+        """
+        game = self.game
