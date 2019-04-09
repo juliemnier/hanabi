@@ -1,17 +1,12 @@
 """
 Artificial Intelligence to play Hanabi.
 """
-from random import randint
-
-class AI:
-    """
-    AI base class: some basic functions, game analysis.
-    """
-    def __init__(self, game):
-        self.game = game
+import random as rd
+import ai
 
 
-class Cheater(AI):
+
+class Cheater(ai.AI):
     """
     This player can see his own cards!
 
@@ -133,13 +128,13 @@ class RandomPlaying(AI):
 
         #choosing a random action
 
-        acts=['d','p','c','x','l']
-        do=random.choice(acts)
+        acts=['d','p','c']
+        do=rd.choice(acts)
 
         #choosing a random card from your hand
 
-        i=randint(1,5)
-        mycard=game.current_hand.cards[i][0]
+        i=rd.randint(0,4)
+        mycard=game.current_hand.cards[i] #[0]?
 
         if (do=='p'):
             return "p%d"%mycard
@@ -148,8 +143,8 @@ class RandomPlaying(AI):
 
         if (do=='c'):
             if game.blue_coins>0:
-                j=randint(1,5)
-                cartchosen=game.hands[game.other_player].cards[i]
+                j=rd.randint(0,4)
+                cardchosen=game.hands[game.other_player].cards[j]
                 return "c%d"%cardchosen
             else:
                 return "d%d"%mycard
