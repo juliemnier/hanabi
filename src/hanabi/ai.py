@@ -21,7 +21,21 @@ class Cheater(AI):
       * if blue_coin>0: give a clue on precious card (so a human can play with a Cheater)
       * if blue_coin<8: discard the largest one, except if it's the last of its kind or in chop position in his opponent.
     """
-
+    def counter(self):
+        "look at the table and count the cards"
+        counter=[[3,2,2,2,1] for i in range(5)]
+        colorIds={'Red' : 0,'Blue' : 1,'Green' : 2,'White' : 3,'Yellow' : 4}
+        game = self.game
+        for card in game.discard_pile.cards:
+            tmp=colorIds[str(card.color)]
+            counter[tmp][card.number-1]=counter[tmp][card.number-1]-1
+        for (color,i) in list(game.piles.items()):
+            if (i!=0) :
+                for j in range(1,i+1):
+                    tmp=colorIds[str(color)]	
+                    counter[tmp][j-1]=counter[tmp][j-1]-1
+        return counter
+    
     def play(self):
         "Return the best cheater action."
         game = self.game
