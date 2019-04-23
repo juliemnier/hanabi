@@ -1,6 +1,7 @@
 """
 Artificial Intelligence to play Hanabi.
 """
+import hanabi.ai 
 
 class MeilleureAI(AI):
     """
@@ -15,11 +16,11 @@ class MeilleureAI(AI):
 
 
 	"""
-		determine the list of cards that are playable without using deduction
+	determine the list of cards that are playable without using deduction
 	"""
 	
 	always_playable=[]
-	#on ajoute les cartes dont on connait les deux indices, penser à filtrer après
+	#on ajoute les cartes dont on connait les deux indices puis on filtre
 	for card in game.current_hand.cards:
 		if card.color_clue and card.number_clue :
 		#on verifie qu'elles sont jouables
@@ -63,7 +64,7 @@ class MeilleureAI(AI):
 	#voir si on trouve d'autres cas
 		
 	"""
-		determine is a card is discardable or not
+	determine is a card is discardable or not
 	"""
 
 
