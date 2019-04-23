@@ -1,7 +1,16 @@
 """
 Artificial Intelligence to play Hanabi.
 """
-import hanabi.ai 
+
+#note: peut-etre un pb avec la definition du game=self.game au début de chaque fonction, à checker
+
+class AI:
+    """
+    AI base class: some basic functions, game analysis.
+    """
+    def __init__(self, game):
+        self.game = game
+
 
 class MeilleureAI(AI):
     """
@@ -14,98 +23,129 @@ class MeilleureAI(AI):
         """
         game = self.game
 
+    def always_playable(self):
+        """
+        give a list of cards that are always playable however the current and the other players are playing/deducting
 
-	"""
-	determine the list of cards that are playable without using deduction
-	"""
-	
-	always_playable=[]
-	#on ajoute les cartes dont on connait les deux indices puis on filtre
-	for card in game.current_hand.cards:
-		if card.color_clue and card.number_clue :
-		#on verifie qu'elles sont jouables
-			if game.piles[card.color]+= card.number : 			
-				alway_playable.append(card)
-	#si on a toutes les couleurs des piles au même numéro et qu'on possède le numéro
-	liste_rank=list(game.piles.values())
-	test=liste_test[0]
-	play=True
-	for rank in liste_rank:
-		if rank!=test:
-			play=False
-			break
-	if play:
-		for card in game.current_hand.cards:
-			if card.number_clue==game.piles[Color.Red]: #toutes les valeurs sont les mêmes, on prend Red au hasard
-				always_playable.append(card)
-	
-	#toutes les autres cartes du même numéro ont été jouées
+        """
+        game = self.game
+        always_playable=[]
 
-	#un petit compteur "global":
+        #spotting the cards for which we have two clues then filter
+        for card in game.current_hand.cards:
+            if card.color_clue and card.number_clue :
+		#checking if playable
+                if game.piles[card.color]+1==card.number :
+                    alway_playable.append(card)
 
-	ctr=counter()
-	interesting=[]
-	count=[15,10,10,10,3]
-	int
-	for i in range(5):
-		for color in ctr:
-			count[i]-=color[i]
-	
-	for i in count:
-		if i==1:
-			interesting.append(i)
+	#if all the piles are at the same rank and we own a rank+1
+        liste_rank=list(game.piles.values())
+        test=liste_rank[0]
+        play=True
 
-	if interesting:
-		for i in interesting:
-			for card in game.current_hand.cards:
-				if i-1 in liste_rank and card.number_clue==1:
-					always_playable.append(card)
-	
-	#voir si on trouve d'autres cas
-		
-	"""
-	determine is a card is discardable or not
-	"""
+        for rank in liste_rank:
+            if rank!=test:
+                play=False
+                break
+        if play:
+            for card in game.current_hand.cards:
+                if card.number_clue==game.piles[Color.Red]: #Red and any other color have the same rank
+                    always_playable.append(card)
+
+	#if every card with the same rank has already been played or discared 
+
+        count=global_counter()
+        #count is a tab of size 5 which contains the number of remaining card for the ranks 1,2,3,4,5 (in this order)
+        interesting=[]
+        for (i,value) in enumerate(count):
+            if value==1:
+                interesting.append(i+1)
+
+        if interesting:
+            for rank in interesting:
+                for card in game.current_hand.cards:
+                    if rank-1 in liste_rank and card.number_clue==rank:
+                        always_playable.append(card)
+
+	#see if we find anything else
 
 
+    def always_discardable(self):
+        """
+        gives a list of cards that are always discardable however the current/other players are playing/deducting
+        """
 
-	def counter(self):
-        	"look at the table and count the cards"
-        	counter=[[3,2,2,2,1] for i in range(5)]
-        	colorIds={'Red' : 0,'Blue' : 1,'Green' : 2,'White' : 3,'Yellow' : 4}
-        	game = self.game
-        	for card in game.discard_pile.cards:
-        	    tmp=colorIds[str(card.color)]
-        	    counter[tmp][card.number-1]=counter[tmp][card.number-1]-1
-        	for (color,i) in list(game.piles.items()):
-        	    if (i!=0) :
-        	        for j in range(1,i+1):
-        	            tmp=colorIds[str(color)]	
-        	            counter[tmp][j-1]=counter[tmp][j-1]-1
-        	return counter
-
+        game = self.game
+        always_discardable=[]
+        
+        #spotting the cards for which we have two clues then filter
+        for card in game.current_hand.cards:
+            if card.color_clue and card.number_clue :
+		#checking if discardable
+                if game.piles[card.color]>=card.number :
+                    alway_discardable.append(card)
 
 
+        #if every rank in the piles is above the rank of one of our card : with one clue only
+        
+        liste_rank=list(game.piles.values())
+        for card in game.current_hand.cards:
+            discardable=True
+            if card.number_clue: #not necessary but more visible
+                for rank in liste_rank:
+                    if card.number_clue>rank:
+                        discardable=False
+                if discardable:
+                    alway_discardable.append(card)
 
-###SIMPLE COPIE POUR L'INSTANT
-        #to clue others
+            if game.piles[card.color_clue]==5:
+                alway_discardable.append(card)
 
-        precious = [ card for card in game.hands[game.other_player].cards
-                     if (1+game.discard_pile.cards.count(card))
-                         == game.deck.card_count[card.number]
-        if precious:
-            clue=False
-            
+        #if the color itself is discardable because all the cards of a rank above the rank of the pile have already been played/discarded
 
-                     
-        #to play a card
-        #joue une carte mais sans prendre en compte la couleur des piles déjà faite
-        playable = [ (i+1, card.number) for (i,card) in
-                     enumerate(game.current_hand.cards)
-                     if game.piles[card.color]+1 == card.number_clue ]
+        colorIds={'Red' : 0,'Blue' : 1,'Green' : 2,'White' : 3,'Yellow' : 4}
+        counter=counter()
+        for card in game.current_hand.cards:
+            if card.color_clue:
+                #picking the list corresponding to the card's color
+                count= counter[colorIds[str(card.color_clue)]]
+                for remaining in count:
+                    if remaining==0 and ####TO BE CONTINUED
+                    
 
-        if card.number_clue==1:
-                     
-        playable_nocolor_required = [ (i+1, card.number) for (i,card) in
-                     enumerate(game.current_hand.cards)
-                     if card.number_clue==1 ]
+
+
+            #see if we find anything else
+    def counter(self):
+        """
+        look at the table and count the cards played and discared
+        """
+        counter=[[3,2,2,2,1] for i in range(5)]
+        colorIds={'Red' : 0,'Blue' : 1,'Green' : 2,'White' : 3,'Yellow' : 4}
+        game = self.game
+        for card in game.discard_pile.cards:
+            tmp=colorIds[str(card.color)]
+            counter[tmp][card.number-1]=counter[tmp][card.number-1]-1
+            for (color,i) in list(game.piles.items()):
+                if (i!=0) :
+                    for j in range(1,i+1):
+                        tmp=colorIds[str(color)]
+                        counter[tmp][j-1]=counter[tmp][j-1]-1
+        return counter
+
+
+    def global_counter(self):
+        """
+        look at the table and count the cards played and discared by rank only 
+        """
+        game=self.game
+        ctr=counter()
+        #count is a tab of size 5 which contains the number of remaining card for the ranks 1,2,3,4,5 (in this order)
+        count=[15,10,10,10,3]
+        for i in range(5):
+            for color in ctr:
+                count[i]-=color[i]
+
+
+        return count
+
