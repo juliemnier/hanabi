@@ -23,7 +23,8 @@ class MeilleureAI(AI):
         """
         game = self.game
 
-    def always_playable(self):
+    def always_playable(self,hand): #à appeler avec game.current_hand et game.next_hand ou l'equivalent
+
         """
         give a list of cards that are always playable however the current and the other players are playing/deducting
 
@@ -32,7 +33,7 @@ class MeilleureAI(AI):
         always_playable=[]
 
         #spotting the cards for which we have two clues then filter
-        for card in game.current_hand.cards:
+        for card in hand.cards:
             if card.color_clue and card.number_clue :
 		#checking if playable
                 if game.piles[card.color]+1==card.number :
@@ -48,7 +49,7 @@ class MeilleureAI(AI):
                 play=False
                 break
         if play:
-            for card in game.current_hand.cards:
+            for card in hand.cards:
                 if card.number_clue==game.piles[Color.Red]: #Red and any other color have the same rank
                     always_playable.append(card)
 
@@ -63,7 +64,7 @@ class MeilleureAI(AI):
 
         if interesting:
             for rank in interesting:
-                for card in game.current_hand.cards:
+                for card in hand.cards:
                     if rank-1 in liste_rank and card.number_clue==rank:
                         always_playable.append(card)
 
@@ -109,11 +110,11 @@ class MeilleureAI(AI):
             if card.color_clue:
                 #picking the list corresponding to the card's color
                 count= counter[colorIds[str(card.color_clue)]]
-                #for remaining in count:
+                for remaining in count:
                  #   if remaining==0 and ####TO BE CONTINUED
                     
 
-
+    #
 
             #see if we find anything else
     def counter(self):
@@ -141,7 +142,7 @@ class MeilleureAI(AI):
         game=self.game
         ctr=counter()
         #count is a tab of size 5 which contains the number of remaining card for the ranks 1,2,3,4,5 (in this order)
-        count=[15,10,10,10,3]
+        count=[15,10,10,10,5]
         for i in range(5):
             for color in ctr:
                 count[i]-=color[i]
