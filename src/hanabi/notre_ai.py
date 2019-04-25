@@ -109,8 +109,8 @@ class MeilleureAI(AI):
             if card.color_clue:
                 #picking the list corresponding to the card's color
                 count= counter[colorIds[str(card.color_clue)]]
-                for remaining in count:
-                    if remaining==0 and ####TO BE CONTINUED
+                #for remaining in count:
+                 #   if remaining==0 and ####TO BE CONTINUED
                     
 
 

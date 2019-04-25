@@ -94,6 +94,7 @@ class Cheater(AI):
                 if new_counter[tmp][j-1]==0 and j in deduction[i][0]:
                     deduction[i][0].remove(j)
         return deduction
+    
     def play(self):
         "Return the best cheater action."
         game = self.game
