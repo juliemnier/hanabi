@@ -2,6 +2,7 @@
 Artificial Intelligence to play Hanabi.
 """
 import random as rd
+import hanabi
 
 import itertools
 
@@ -48,7 +49,51 @@ class Cheater(AI):
                     tmp=colorIds[str(color)]	
                     counter[tmp][j-1]=counter[tmp][j-1]-1
         return counter
-    
+
+    def deduction(self):
+        "deduct new clues from the others"
+        game = self.game
+        counter=self.counter()
+        rank=[1,2,3,4,5]
+        Color=hanabi.deck.Color
+        colors=list(Color)
+        deduction=[[rank,colors] for i in game.current_hand.cards]
+        clue_rk=[[],[]]
+        #deductions from clues
+        i=0
+        for card in game.current_hand.cards:
+            if card.color_clue!=False:
+                deduction[i][1]=[card.color]
+                clue_rk[1].append(i)
+            if card.number_clue!=False:
+                deduction[i][0]=[card.number]
+                clue_rk[0].append(i)
+            i+=1
+        #creation of a new counter which takes into account the cards of the others
+        colorIds={'Red' : 0,'Blue' : 1,'Green' : 2,'White' : 3,'Yellow' : 4}
+        new_counter=counter
+        for card in self.other_players_cards:
+            tmp=colorIds[str(card.color)]
+            new_counter[tmp][card.number-1]=new_counter[tmp][card.number-1]-1
+        #deductions from counter
+        current_hand=game.current_hand
+        for i in clue_rk[0]:
+            card=current_hand.cards[i]
+            nb=card.number
+            for j in list(Color):
+                tmp=colorIds[str(j)]
+                if new_counter[tmp][nb-1]==0 and j in deduction[i][1]:
+                    print(j)
+                    print(deduction[i][1])
+                    deduction[i][1].remove(j)
+        for i in clue_rk[1]:
+            card=current_hand.cards[i]
+            color=card.color
+            tmp=colorIds[str(color)]
+            for j in range(1,6):
+                if new_counter[tmp][j-1]==0 and j in deduction[i][0]:
+                    deduction[i][0].remove(j)
+        return deduction
     def play(self):
         "Return the best cheater action."
         game = self.game
