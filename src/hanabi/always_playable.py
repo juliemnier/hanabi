@@ -18,4 +18,4 @@ def always_playable(self):
         if play :
             always_playable.append(game.current_hand.cards[i])
         i+=1
-    
+    return always_playable
