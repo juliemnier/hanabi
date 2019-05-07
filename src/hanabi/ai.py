@@ -12,7 +12,10 @@ class AI:
     """
     def __init__(self, game):
         self.game = game
-
+        self.c_turn = 0
+        self.nb_joueurs = len(game.players)
+        self.list_deduction=[0]*nb_joueurs
+        
     @property
     def other_hands(self):
         "The list of other players' hands."
