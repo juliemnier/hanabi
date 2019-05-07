@@ -3,13 +3,8 @@ Artificial Intelligence to play Hanabi.
 """
 
 #note: peut-etre un pb avec la definition du game=self.game au début de chaque fonction, à checker
-
-class AI:
-    """
-    AI base class: some basic functions, game analysis.
-    """
-    def __init__(self, game):
-        self.game = game
+#ne pas oublier d'incrémenter le nb de tours
+from hanabi.ai import AI
 
 
 
@@ -23,10 +18,15 @@ class MeilleureAI(AI):
         return the best action possible
         """
         game = self.game
-        playable=always_playable(game.current_hand)
+        #attention : à changer si on change always_playable(self)
+        playable=self.always_playable(game.current_hand)
+        discardable=self.always_discardable(game.current_hand)
         #mise à jour de actions, liste tournante
+
+        player=self.c_turn
+
         #deductions
-        prev_action=actions[-1]
+        prev_action=actions[(player-1)%self.nb_joueurs]
         changed=self.has_changed()
         liste_rank=list(game.piles.values())
 
@@ -34,30 +34,53 @@ class MeilleureAI(AI):
             #if the clue is on a color and only one card is concerned (cf. strategy)
             if not prev_action[1].isdigit() and len(changed)==1:
                 #play the card without question
+                self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
                 return "p%d"%changed[0][0]
-            if prev_action[1].isdigit() and ((prev_action[1]-1) in liste_rank):
-                #on utilise self.deduction() mais jsp comment
-                self.deduction()
-                for card in changed:
-                    playable.append(card[1])
+            if prev_action[1].isdigit():
+                if ((prev_action[1]-1) in liste_rank):
+                    #on utilise self.deduction() mais jsp comment
+                    self.deduction()
+                    for card in changed:
+                        playable.append(card)
+                trouve=False
+                for rank in liste_rank:
+                    if rank>=prev_action[1]:
+                        trouve=True
+                        break
+                if not trouve:
+                    for card in changed:
+                        discardable.append(card)
 
-            #if a card can be played
-            if playable:
-                #voir si on rajoute les priorités
-                return "p%d"%playable[0][0]
+        changed=self.list_changed[(self.c_turn)%self.nb_joueurs]
+
+        #if a card can be played
+
+        if playable:
+            #voir si on rajoute les priorités
+            self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
+            #remplacer dans actions
+            return "p%d"%playable[0][0]
+
+
+        #beginning the strategy
+
+        if game.blue_coins>0:
+
+            interesting=[]
+
+
+            for (i,card) in enumerate(self.other_hands.cards):
+                    interesting.append([player, i+1, card.number] for (i,card) in
+                     enumerate(self.other_hands.cards)
+                     if game.piles[card.color]+1 == card.number ]
+
+            if interesting:
+                trouve=False
+                for player in range(len(self.other_hands)):
+                player=1
 
 
 
-
-
-    def has_changed(self):
-        changed=[]
-        prev_hand=prev_hands[0]
-        for (i,card) in enumerate(game.current_hand.cards):
-            #attention : sous quelle forme est prev_hand ? besoin de .cards ?
-            if card.color_clue!=prev_hand[i].color_clue or card.number_clue!=prev_hand[i].number_clue :
-                changed.append([i+1,card)] #à tester: peut-être i
-        return changed
 
 
     def always_playable(self,hand): #à appeler avec game.current_hand et game.next_hand ou l'equivalent
@@ -122,6 +145,9 @@ class MeilleureAI(AI):
 		#checking if discardable
                 if game.piles[card.color]>=card.number :
                     alway_discardable.append([i+1,card])
+                if card in self.other_players_cards :
+                    #voir si on garde dans discardable
+                    alway_discardable.append([i+1,card])
 
 
         #if every rank in the piles is above the rank of one of our card : with one clue only
@@ -151,7 +177,7 @@ class MeilleureAI(AI):
                  #   if remaining==0 and ####TO BE CONTINUED
                         alway_discardable.append([i+1,card])
 
-
+     
 
     #see if we find anything else
     def counter(self):
