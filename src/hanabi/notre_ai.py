@@ -27,9 +27,9 @@ class MeilleureAI(AI):
 
         #deductions
         prev_action=actions[(player-1)%self.nb_joueurs]
-        changed=self.has_changed()
         liste_rank=list(game.piles.values())
-
+        changed=self.list_changed[(self.c_turn)%self.nb_joueurs]
+        
         if (prev_action[0]==c):
             #if the clue is on a color and only one card is concerned (cf. strategy)
             if not prev_action[1].isdigit() and len(changed)==1:
@@ -37,7 +37,7 @@ class MeilleureAI(AI):
                 self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
                 return "p%d"%changed[0][0]
             if prev_action[1].isdigit():
-                if ((prev_action[1]-1) in liste_rank):
+                if ((int(prev_action[1])-1) in liste_rank):
                     #on utilise self.deduction() mais jsp comment
                     self.deduction()
                     for card in changed:
@@ -51,7 +51,7 @@ class MeilleureAI(AI):
                     for card in changed:
                         discardable.append(card)
 
-        changed=self.list_changed[(self.c_turn)%self.nb_joueurs]
+
 
         #if a card can be played
 
@@ -68,16 +68,20 @@ class MeilleureAI(AI):
 
             interesting=[]
 
-
+            player=1
             for (i,card) in enumerate(self.other_hands.cards):
-                    interesting.append([player, i+1, card.number] for (i,card) in
-                     enumerate(self.other_hands.cards)
-                     if game.piles[card.color]+1 == card.number ]
+                if i%5==0:
+                    player+=1
+                if game.piles[card.color]+1 == card.number ]:
+                    interesting.append([player, i+1, card.number])
+
 
             if interesting:
                 trouve=False
-                for player in range(len(self.other_hands)):
-                player=1
+            
+                for (j,move) in enumerate(interesting):
+                    concerned_player=interesting[j][0]
+                    
 
 
 
