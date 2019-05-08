@@ -17,39 +17,56 @@ class MeilleureAI(AI):
         """
         return the best action possible
         """
+        
         game = self.game
         #attention : à changer si on change always_playable(self)
         playable=self.always_playable(game.current_hand)
         discardable=self.always_discardable(game.current_hand)
-        #mise à jour de actions, liste tournante
-
-        player=self.c_turn
-
-        #deductions
-        prev_action=actions[(player-1)%self.nb_joueurs]
-        liste_rank=list(game.piles.values())
+        deduction=self.list_deduction[(self.c_turn)%self.nb_joueurs]
         changed=self.list_changed[(self.c_turn)%self.nb_joueurs]
-        
+
+         #updating deduction with the card played in the player previous turn
+
+        if self.c_turn<self.nb_joueurs:
+            deduction=self.deduction()
+        else:
+            if self.actions[(self.c_turn)%self.nb_joueurs][0]==p or self.actions[(self.c_turn)%self.nb_joueurs][0]==d:
+                deduction.pop(int(self.actions[(self.c_turn)%self.nb_joueurs][1])-1)
+                deduction.append([[1,2,3,4,5],list(hanabi.deck.Color)])
+
+
+
+
+
+
+
+        #deductions : for now, the clue is only to be given to the next player.
+
+        prev_action=self.actions[(self.c_turn-1)%self.nb_joueurs]
+        liste_rank=list(game.piles.values())
+
         if (prev_action[0]==c):
             #if the clue is on a color and only one card is concerned (cf. strategy)
             if not prev_action[1].isdigit() and len(changed)==1:
                 #play the card without question
                 self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
+                self.actions[(self.c_turn)%self.nb_joueurs]= "p%d"%changed[0][0]
                 return "p%d"%changed[0][0]
-            if prev_action[1].isdigit():
-                if ((int(prev_action[1])-1) in liste_rank):
+            
+            # if prev_action[1].isdigit():
+             #   if ((int(prev_action[1])-1) in liste_rank):
                     #on utilise self.deduction() mais jsp comment
-                    self.deduction()
-                    for card in changed:
-                        playable.append(card)
-                trouve=False
-                for rank in liste_rank:
-                    if rank>=prev_action[1]:
-                        trouve=True
-                        break
-                if not trouve:
-                    for card in changed:
-                        discardable.append(card)
+              #      self.deduction()
+               #     for card in changed:
+                #        playable.append(card)
+               # trouve=False
+               # for rank in liste_rank:
+                #    if rank>=prev_action[1]:
+                 #       trouve=True
+                  #      break
+               # if not trouve:
+                #    for card in changed:
+                 #       discardable.append(card)
 
 
 
@@ -67,13 +84,11 @@ class MeilleureAI(AI):
         if game.blue_coins>0:
 
             interesting=[]
+            #voir ligne 355 deck
 
-            player=1
-            for (i,card) in enumerate(self.other_hands.cards):
-                if i%5==0:
-                    player+=1
+            for (i,card) in enumerate(self.other_hands[0].cards):
                 if game.piles[card.color]+1 == card.number ]:
-                    interesting.append([player, i+1, card.number])
+                    interesting.append([i+1, card.number])
 
 
             if interesting:
@@ -216,3 +231,51 @@ class MeilleureAI(AI):
 
 
         return count
+
+
+    
+    def deduction(self):
+        "deduct new clues from the others"
+        game = self.game
+        counter=self.counter()
+        rank=[1,2,3,4,5]
+        Color=hanabi.deck.Color
+        colors=list(Color)
+        deduction=[[rank,colors] for i in game.current_hand.cards]
+        clue_rk=[[],[]]
+        #deductions from clues
+        i=0
+        for card in game.current_hand.cards:
+            if card.color_clue!=False:
+                deduction[i][1]=[card.color]
+                clue_rk[1].append(i)
+            if card.number_clue!=False:
+                deduction[i][0]=[card.number]
+                clue_rk[0].append(i)
+            i+=1
+        #creation of a new counter which takes into account the cards of the others
+        colorIds={'Red' : 0,'Blue' : 1,'Green' : 2,'White' : 3,'Yellow' : 4}
+        new_counter=counter
+        for card in self.other_players_cards:
+            tmp=colorIds[str(card.color)]
+            new_counter[tmp][card.number-1]=new_counter[tmp][card.number-1]-1
+        #deductions from counter
+        current_hand=game.current_hand
+        for i in clue_rk[0]:
+            card=current_hand.cards[i]
+            nb=card.number
+            for j in list(Color):
+                tmp=colorIds[str(j)]
+                if new_counter[tmp][nb-1]==0 and j in deduction[i][1]:
+                    print(j)
+                    print(deduction[i][1])
+                    deduction[i][1].remove(j)
+        for i in clue_rk[1]:
+            card=current_hand.cards[i]
+            color=card.color
+            tmp=colorIds[str(color)]
+            for j in range(1,6):
+                if new_counter[tmp][j-1]==0 and j in deduction[i][0]:
+                    deduction[i][0].remove(j)
+        return deduction
+    
