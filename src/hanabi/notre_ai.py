@@ -47,10 +47,11 @@ class MeilleureAI(AI):
         if (prev_action[0]==c):
             #if only one card is concerned (cf. strategy)
             if len(changed)==1:
-                if changed[1].number_clue is False or changed[1].color_clue is False:
+                if changed[0][1].number_clue is False or changed[0][1].color_clue is False:
                     #play the card without question anyway
                     self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
                     self.actions[(self.c_turn)%self.nb_joueurs]= "p%d"%changed[0][0]
+                    self.c_turn+=1
                     return "p%d"%changed[0][0]
             
             # if prev_action[1].isdigit():
@@ -76,6 +77,7 @@ class MeilleureAI(AI):
             #voir si on rajoute les priorités
             self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
             self.actions[(self.c_turn)%self.nb_joueurs]= "p%d"%playable[0][0]
+            self.c_turn+=1
             return "p%d"%playable[0][0]
 
 
@@ -96,17 +98,19 @@ class MeilleureAI(AI):
                     count_rank=0
                     count_color=0
                     for card in self.other_hands[0].cards:
-                        if card.number_clue==p[1].number:
+                        if card.number==p[1].number:
                             count_rank+=1
-                        if card.color_clue==p[1].color:
-                            count_rank+=1
+                        if card.color==p[1].color:
+                            count_color+=1
                     if p[1].number_clue is False and count_rank==1:
                         self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
                         self.actions[(self.c_turn)%self.nb_joueurs]= "c%d"%p[1].number
+                        self.c_turn+=1
                         return "c%d"%p[1].number
                     if p[1].color_clue is False and count_color==1:
                         self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
                         self.actions[(self.c_turn)%self.nb_joueurs]= "c%s"%p[1].color
+                        self.c_turn+=1
                         return "c%s"%p[1].color
 
                     #when the clue to give is obvious
@@ -114,13 +118,35 @@ class MeilleureAI(AI):
                     if p[1].number_clue is False and p[1].color_clue :
                         self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
                         self.actions[(self.c_turn)%self.nb_joueurs]= "c%d"%p[1].number
+                        self.c_turn+=1
                         return "c%d"%p[1].number
                     if p[1].color_clue is False and p[1].number_clue :
+                        clue="c%s"%p[1].color
+                        clue=clue[:2]
                         self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
-                        self.actions[(self.c_turn)%self.nb_joueurs]= "c%s"%p[1].color
-                        return "c%s"%p[1].color
+                        self.actions[(self.c_turn)%self.nb_joueurs]= clue
+                        self.c_turn+=1
+                        return clue
 
-                
+            #intersections
+
+            if game.blue_coins>1:
+                count_rank=[0,0,0,0,0]
+                count_color=[['Red',0],['Blue',0],['Green',0],['White',0],['Yellow',0]]
+
+                for card in self.other_hands[0].cards:
+                    count_rank[card.number]+=1
+                    indice=0
+                    for i in count_color:
+                        if card.color==count_color[i][0]:
+                            indice=i
+
+                    count_color[indice]+=1
+                j=0
+                maxi=
+                best_rank=max(count_rank)
+                best_color=max(
+
 
 
 
