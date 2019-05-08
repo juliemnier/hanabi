@@ -47,10 +47,11 @@ class MeilleureAI(AI):
         if (prev_action[0]==c):
             #if only one card is concerned (cf. strategy)
             if len(changed)==1:
-                #play the card without question
-                self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
-                self.actions[(self.c_turn)%self.nb_joueurs]= "p%d"%changed[0][0]
-                return "p%d"%changed[0][0]
+                if changed[1].number_clue is False or changed[1].color_clue is False:
+                    #play the card without question anyway
+                    self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
+                    self.actions[(self.c_turn)%self.nb_joueurs]= "p%d"%changed[0][0]
+                    return "p%d"%changed[0][0]
             
             # if prev_action[1].isdigit():
              #   if ((int(prev_action[1])-1) in liste_rank):
@@ -105,8 +106,21 @@ class MeilleureAI(AI):
                         return "c%d"%p[1].number
                     if p[1].color_clue is False and count_color==1:
                         self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
-                        self.actions[(self.c_turn)%self.nb_joueurs]= "c%s"%p[1].numbercolor
+                        self.actions[(self.c_turn)%self.nb_joueurs]= "c%s"%p[1].color
                         return "c%s"%p[1].color
+
+                    #when the clue to give is obvious
+
+                    if p[1].number_clue is False and p[1].color_clue :
+                        self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
+                        self.actions[(self.c_turn)%self.nb_joueurs]= "c%d"%p[1].number
+                        return "c%d"%p[1].number
+                    if p[1].color_clue is False and p[1].number_clue :
+                        self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
+                        self.actions[(self.c_turn)%self.nb_joueurs]= "c%s"%p[1].color
+                        return "c%s"%p[1].color
+
+                
 
 
 
