@@ -15,7 +15,7 @@ class AI:
         self.c_turn = 0 #Counter of turn
         self.nb_joueurs = len(game.players) #Number of players
         self.list_deduction=[[] for i in range(self.nb_joueurs)] #A list of lists deductions (cf self.deduction) 
-        self.actions=[[] for i in range(self.nb_joueurs)] #A list with the memory of the previous actions for each player.[[[cards concerned],action,target]]
+        self.actions=[[] for i in range(self.nb_joueurs)] #A list with the memory of the previous actions for each player.[action]
         self.list_changed=[[] for i in range(self.nb_joueurs)] #A list with the memory of the card which have changed for each player during the turn of another player.[[[cards changed by the action of the player 1],[...player 2]]]
     
         

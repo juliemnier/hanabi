@@ -17,17 +17,17 @@ class MeilleureAI(AI):
         """
         game = self.game
         playable=always_playable(game.current_hand)
-        ## mise à jour de actions, liste tournante
-        #mise à jour de déduction
         deduction=self.list_deduction[(self.c_turn)%self.nb_joueurs]
         changed=self.list_changed[(self.c_turn)%self.nb_joueurs]
+        #mise à jour de déduction
         if self.c_turn<self.nb_joueurs:
             deduction=self.deduction()
         else:
             if self.actions[(self.c_turn)%self.nb_joueurs][0]==p or self.actions[(self.c_turn)%self.nb_joueurs][0]==d:
-            deduction[5]=[[1,2,3,4,5],list(hanabi.deck.Color)]
+                deduction.pop(int(self.actions[(self.c_turn)%self.nb_joueurs][1])-1)
+                deduction.append([[1,2,3,4,5],list(hanabi.deck.Color)])
 
-        #
+        ##
         liste_rank=list(game.piles.values())
         for list_card in self.list_changed[(self.c_turn)%self.nb_joueurs]:
             #if the clue is on a color and only one card is concerned (cf. strategy)
