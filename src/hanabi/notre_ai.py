@@ -20,8 +20,6 @@ class MeilleureAI(AI):
         
         game = self.game
         #attention : à changer si on change always_playable(self)
-        playable=self.always_playable(game.current_hand)
-        discardable=self.always_discardable(game.current_hand)
         deduction=self.list_deduction[(self.c_turn)%self.nb_joueurs]
         changed=self.list_changed[(self.c_turn)%self.nb_joueurs]
 
@@ -30,12 +28,13 @@ class MeilleureAI(AI):
         if self.c_turn<self.nb_joueurs:
             deduction=self.deduction()
         else:
-            if self.actions[(self.c_turn)%self.nb_joueurs][0]==p or self.actions[(self.c_turn)%self.nb_joueurs][0]==d:
+            if self.actions[(self.c_turn)%self.nb_joueurs][0]=='p' or self.actions[(self.c_turn)%self.nb_joueurs][0]=='d':
                 deduction.pop(int(self.actions[(self.c_turn)%self.nb_joueurs][1])-1)
                 deduction.append([[1,2,3,4,5],list(hanabi.deck.Color)])
 
-
-
+        self.list_deduction[(self.c_turn)%self.nb_joueurs]=deduction
+        playable=self.always_playable()
+        discardable=self.always_discardable(game.current_hand)
 
 
 
@@ -46,8 +45,8 @@ class MeilleureAI(AI):
         liste_rank=list(game.piles.values())
 
         if (prev_action[0]==c):
-            #if the clue is on a color and only one card is concerned (cf. strategy)
-            if not prev_action[1].isdigit() and len(changed)==1:
+            #if only one card is concerned (cf. strategy)
+            if len(changed)==1:
                 #play the card without question
                 self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
                 self.actions[(self.c_turn)%self.nb_joueurs]= "p%d"%changed[0][0]
@@ -75,7 +74,7 @@ class MeilleureAI(AI):
         if playable:
             #voir si on rajoute les priorités
             self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
-            #remplacer dans actions
+            self.actions[(self.c_turn)%self.nb_joueurs]= "p%d"%playable[0][0]
             return "p%d"%playable[0][0]
 
 
@@ -87,68 +86,56 @@ class MeilleureAI(AI):
             #voir ligne 355 deck
 
             for (i,card) in enumerate(self.other_hands[0].cards):
-                if game.piles[card.color]+1 == card.number ]:
-                    interesting.append([i+1, card.number])
+                if game.piles[card.color]+1 == card.number:
+                    interesting.append([i+1,card])
 
 
             if interesting:
-                trouve=False
-            
-                for (j,move) in enumerate(interesting):
-                    concerned_player=interesting[j][0]
-                    
+                for p in interesting:
+                    count_rank=0
+                    count_color=0
+                    for card in self.other_hands[0].cards:
+                        if card.number_clue==p[1].number:
+                            count_rank+=1
+                        if card.color_clue==p[1].color:
+                            count_rank+=1
+                    if p[1].number_clue is False and count_rank==1:
+                        self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
+                        self.actions[(self.c_turn)%self.nb_joueurs]= "c%d"%p[1].number
+                        return "c%d"%p[1].number
+                    if p[1].color_clue is False and count_color==1:
+                        self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
+                        self.actions[(self.c_turn)%self.nb_joueurs]= "c%s"%p[1].numbercolor
+                        return "c%s"%p[1].color
 
 
 
 
 
-    def always_playable(self,hand): #à appeler avec game.current_hand et game.next_hand ou l'equivalent
+
+    def always_playable(self): 
 
         """
         give a list of cards that are always playable however the current and the other players are playing/deducting
 
         """
-        game = self.game
+
+        game  = self.game
         always_playable=[]
 
-        #spotting the cards for which we have two clues then filter
-        for (i,card) in enumerate(hand.cards):
-            if card.color_clue and card.number_clue :
-		#checking if playable
-                if game.piles[card.color]+1==card.number :
-                    alway_playable.append([i+1,card])
-
-	#if all the piles are at the same rank and we own a rank+1
-        liste_rank=list(game.piles.values())
-        test=liste_rank[0]
-        play=True
-
-        for rank in liste_rank:
-            if rank!=test:
-                play=False
-                break
-        if play:
-            for (i,card) in enumerate(hand.cards):
-                if card.number_clue==game.piles[Color.Red]: #Red and any other color have the same rank
-                    always_playable.append([i+1,card])
-
-	#if every card with the same rank has already been played or discared
-
-        count=self.global_counter()
-        #count is a tab of size 5 which contains the number of remaining card for the ranks 1,2,3,4,5 (in this order)
-        interesting=[]
-        for (i,value) in enumerate(count):
-            if value==1:
-                interesting.append(i+1)
-
-        if interesting:
-            for rank in interesting:
-                for (i,card) in enumerate(hand.cards):
-                    if rank-1 in liste_rank and card.number_clue==rank:
-                        always_playable.append([i+1,card])
-
-	#see if we find anything else
-
+        i=0
+        for card in deduction:
+            play=True
+            for rank in card[0]:
+                for color in card[1]:
+                    if game.piles[color]+1!=rank:
+                        play=False
+                        break
+                if play == False: break
+            if play :
+                always_playable.append(game.current_hand.cards[i])
+            i+=1
+        return always_playable
 
     def always_discardable(self,hand): #with game.current_hand
         """
