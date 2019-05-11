@@ -65,7 +65,7 @@ class MeilleureAI(AI):
 			    deduction[i][1]=color
 
 	self.list_deduction[(self.c_turn)%self.nb_joueurs]=deduction
-        playable=self.always_playable()
+        playable=self.always_playable(deduction)
         discardable=self.always_discardable(game.current_hand)
 
         #if a card can be played
@@ -152,7 +152,7 @@ class MeilleureAI(AI):
 
 
 
-    def always_playable(self): 
+    def always_playable(self,deduction): 
 
         """
         give a list of cards that are always playable however the current and the other players are playing/deducting
