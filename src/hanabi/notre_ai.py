@@ -38,19 +38,12 @@ class MeilleureAI(AI):
 		    if card.color_clue:
 			deduction[i-1][1]=card.color_clue
 
-        self.list_deduction[(self.c_turn)%self.nb_joueurs]=deduction
-        playable=self.always_playable()
-        discardable=self.always_discardable(game.current_hand)
-
-
-
-
         #deductions : for now, the clue is only to be given to the next player.
 	
         prev_action=self.actions[(self.c_turn-1)%self.nb_joueurs]
         liste_rank=list(game.piles.values())
 	if prev_action:
-            if (prev_action[0]==c):
+            if (prev_action[0]=='c'):
                	#if only one card is concerned (cf. strategy)
                	if len(changed)==1:
                     if changed[0][1].number_clue is False or changed[0][1].color_clue is False:
@@ -60,22 +53,20 @@ class MeilleureAI(AI):
                     	self.c_turn+=1
                     	return "p%d"%changed[0][0]
             
-            # if prev_action[1].isdigit():
-             #   if ((int(prev_action[1])-1) in liste_rank):
-                    #on utilise self.deduction() mais jsp comment
-              #      self.deduction()
-               #     for card in changed:
-                #        playable.append(card)
-               # trouve=False
-               # for rank in liste_rank:
-                #    if rank>=prev_action[1]:
-                 #       trouve=True
-                  #      break
-               # if not trouve:
-                #    for card in changed:
-                 #       discardable.append(card)
+            	elif prev_action[1].isdigit():
+            	    #more than 2 cards have to be concerned
+		    rk=int(prev_action[1])
+            	    if list_rank.count((rk-1))!=0 and list_rank.count(rk-1)<=len(changed):
+			color=[]
+			for i in range(5):
+			    if liste_rank[i]==rk-1 : color.append(list(hanabi.deck.Color)[i])
+			for (i,card) in changed:
+			    #update deduction then playable does the rest
+			    deduction[i][1]=color
 
-
+	self.list_deduction[(self.c_turn)%self.nb_joueurs]=deduction
+        playable=self.always_playable()
+        discardable=self.always_discardable(game.current_hand)
 
         #if a card can be played
 
