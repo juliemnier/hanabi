@@ -31,6 +31,12 @@ class MeilleureAI(AI):
             if self.actions[(self.c_turn)%self.nb_joueurs][0]=='p' or self.actions[(self.c_turn)%self.nb_joueurs][0]=='d':
                 deduction.pop(int(self.actions[(self.c_turn)%self.nb_joueurs][1])-1)
                 deduction.append([[1,2,3,4,5],list(hanabi.deck.Color)])
+	    if self.actions[(self.c_turn-1)%self.nb_joueurs][0]=='c':
+		for (i,card) in changed:
+		    if card.number_clue:
+		    	deduction[i-1][0]=card.number_clue
+		    if card.color_clue:
+			deduction[i-1][1]=card.color_clue
 
         self.list_deduction[(self.c_turn)%self.nb_joueurs]=deduction
         playable=self.always_playable()
@@ -40,19 +46,19 @@ class MeilleureAI(AI):
 
 
         #deductions : for now, the clue is only to be given to the next player.
-
+	
         prev_action=self.actions[(self.c_turn-1)%self.nb_joueurs]
         liste_rank=list(game.piles.values())
-
-        if (prev_action[0]==c):
-            #if only one card is concerned (cf. strategy)
-            if len(changed)==1:
-                if changed[0][1].number_clue is False or changed[0][1].color_clue is False:
-                    #play the card without question anyway
-                    self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
-                    self.actions[(self.c_turn)%self.nb_joueurs]= "p%d"%changed[0][0]
-                    self.c_turn+=1
-                    return "p%d"%changed[0][0]
+	if prev_action:
+            if (prev_action[0]==c):
+               	#if only one card is concerned (cf. strategy)
+               	if len(changed)==1:
+                    if changed[0][1].number_clue is False or changed[0][1].color_clue is False:
+                    	#play the card without question anyway
+                    	self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
+                    	self.actions[(self.c_turn)%self.nb_joueurs]= "p%d"%changed[0][0]
+                    	self.c_turn+=1
+                    	return "p%d"%changed[0][0]
             
             # if prev_action[1].isdigit():
              #   if ((int(prev_action[1])-1) in liste_rank):
@@ -108,10 +114,12 @@ class MeilleureAI(AI):
                         self.c_turn+=1
                         return "c%d"%p[1].number
                     if p[1].color_clue is False and count_color==1:
+			clue="c%s"%p[1].color
+                        clue=clue[:2]
                         self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
-                        self.actions[(self.c_turn)%self.nb_joueurs]= "c%s"%p[1].color
-                        self.c_turn+=1
-                        return "c%s"%p[1].color
+                        self.actions[(self.c_turn)%self.nb_joueurs]= clue
+                        self.c_turn=self.c_turn+1
+                        return clue
 
                     #when the clue to give is obvious
 
