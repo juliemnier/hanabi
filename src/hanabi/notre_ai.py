@@ -56,7 +56,7 @@ class MeilleureAI(AI):
             	elif prev_action[1].isdigit():
             	    #more than 2 cards have to be concerned
 		    rk=int(prev_action[1])
-            	    if list_rank.count((rk-1))!=0 and list_rank.count(rk-1)<=len(changed):
+            	    if list_rank.count((rk-1))!=0 and len(changed)<=list_rank.count(rk-1):
 			color=[]
 			for i in range(5):
 			    if liste_rank[i]==rk-1 : color.append(list(hanabi.deck.Color)[i])
