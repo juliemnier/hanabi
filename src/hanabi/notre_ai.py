@@ -31,40 +31,40 @@ class MeilleureAI(AI):
             if self.actions[(self.c_turn)%self.nb_joueurs][0]=='p' or self.actions[(self.c_turn)%self.nb_joueurs][0]=='d':
                 deduction.pop(int(self.actions[(self.c_turn)%self.nb_joueurs][1])-1)
                 deduction.append([[1,2,3,4,5],list(hanabi.deck.Color)])
-	    if self.actions[(self.c_turn-1)%self.nb_joueurs][0]=='c':
-		for (i,card) in changed:
-		    if card.number_clue:
-		    	deduction[i-1][0]=card.number_clue
-		    if card.color_clue:
-			deduction[i-1][1]=card.color_clue
+            if self.actions[(self.c_turn-1)%self.nb_joueurs][0]=='c':
+                for (i,card) in changed:
+                    if card.number_clue:
+                        deduction[i-1][0]=card.number_clue
+                    if card.color_clue:
+                        deduction[i-1][1]=card.color_clue
 
         #deductions : for now, the clue is only to be given to the next player.
 	
         prev_action=self.actions[(self.c_turn-1)%self.nb_joueurs]
         liste_rank=list(game.piles.values())
-	if prev_action:
+        if prev_action:
             if (prev_action[0]=='c'):
                	#if only one card is concerned (cf. strategy)
-               	if len(changed)==1:
+                if len(changed)==1:
                     if changed[0][1].number_clue is False or changed[0][1].color_clue is False:
-                    	#play the card without question anyway
-                    	self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
-                    	self.actions[(self.c_turn)%self.nb_joueurs]= "p%d"%changed[0][0]
-                    	self.c_turn+=1
-                    	return "p%d"%changed[0][0]
+                        #play the card without question anyway
+                        self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
+                        self.actions[(self.c_turn)%self.nb_joueurs]= "p%d"%changed[0][0]
+                        self.c_turn+=1
+                        return "p%d"%changed[0][0]
             
-            	elif prev_action[1].isdigit():
+                elif prev_action[1].isdigit():
             	    #more than 2 cards have to be concerned
-		    rk=int(prev_action[1])
-            	    if list_rank.count((rk-1))!=0 and len(changed)<=list_rank.count(rk-1):
-			color=[]
-			for i in range(5):
-			    if liste_rank[i]==rk-1 : color.append(list(hanabi.deck.Color)[i])
-			for (i,card) in changed:
+                    rk=int(prev_action[1])
+                    if list_rank.count((rk-1))!=0 and len(changed)<=list_rank.count(rk-1):
+                        color=[]
+                        for i in range(5):
+                            if liste_rank[i]==rk-1 : color.append(list(hanabi.deck.Color)[i])
+                        for (i,card) in changed:
 			    #update deduction then playable does the rest
-			    deduction[i][1]=color
+                            deduction[i][1]=color
 
-	self.list_deduction[(self.c_turn)%self.nb_joueurs]=deduction
+        self.list_deduction[(self.c_turn)%self.nb_joueurs]=deduction
         playable=self.always_playable(deduction)
         discardable=self.always_discardable(game.current_hand)
 
@@ -102,12 +102,11 @@ class MeilleureAI(AI):
                     if p[1].number_clue is False and count_rank==1:
                         self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
                         self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
-                        self.actions[(self.c_turn)%self
                         self.actions[(self.c_turn)%self.nb_joueurs]= "c%d"%p[1].number
                         self.c_turn+=1
                         return "c%d"%p[1].number
                     if p[1].color_clue is False and count_color==1:
-			clue="c%s"%p[1].color
+                        clue="c%s"%p[1].color
                         clue=clue[:2]
                         self.list_changed[(self.c_turn)%self.nb_joueurs]=[]        
                         self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
@@ -142,24 +141,24 @@ class MeilleureAI(AI):
                     count_rank[card.number]+=1
                     indice=0
                     for i in count_color:
-                        #peut etre str(card.color)
-                        if card.color==count_color[i][0]:
+                        #peut etre str(card.color) indeed
+                        if str(card.color)==count_color[i][0]:
                             indice=i
 
                     count_color[indice][1]+=1
                 j_rank=0
-                j_color=0
+                j_color=count_color[0][0]
                 maxi_count=count_rank[0]
-                maxi_color=count_color[0][0]
+                maxi_color=count_color[0][1]
 
-                for (i,sum) in enumerate(count_rank):
-                    if sum>=maxi_count:
-                        maxi_count=sum
+                for (i,summ) in enumerate(count_rank):
+                    if summ>=maxi_count:
+                        maxi_count=summ
                         j_rank=i
-                for (i,sum) in enumerate(count_color):
-                    if sum[1]>=maxi_color:
-                        maxi_color=sum[1]
-                        j_color=sum[0]
+                for (i,summ) in enumerate(count_color):
+                    if summ[1]>=maxi_color:
+                        maxi_color=summ[1]
+                        j_color=summ[0]
                 if maxi_count>=maxi_color and maxi_count>=2:
                     for p in self.other_hands[0].cards:
                         if p.number==j_rank:
