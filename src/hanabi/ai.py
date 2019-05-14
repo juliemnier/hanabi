@@ -369,15 +369,15 @@ class MeilleureAI(AI):
                 count_color=[['Red',0],['Blue',0],['Green',0],['White',0],['Yellow',0]]
 
                 for card in self.other_hands[0].cards:
-                    count_rank[card.number]+=1
+                    count_rank[card.number-1]+=1
                     indice=0
-                    for i in count_color:
+                    for (i,liste) in enumerate(count_color):
                         #peut etre str(card.color)
                         if str(card.color)==count_color[i][0]:
                             indice=i
 
                     count_color[indice][1]+=1
-                j_rank=0
+                j_rank=1
                 j_color=count_color[0][0]
                 maxi_count=count_rank[0]
                 maxi_color=count_color[0][1]
@@ -385,7 +385,7 @@ class MeilleureAI(AI):
                 for (i,summ) in enumerate(count_rank):
                     if summ>=maxi_count:
                         maxi_count=summ
-                        j_rank=i
+                        j_rank=i+1
                 for (i,summ) in enumerate(count_color):
                     if summ[1]>=maxi_color:
                         maxi_color=summ[1]
