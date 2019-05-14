@@ -468,7 +468,7 @@ class MeilleureAI(AI):
         """
 
         game  = self.game
-        always_dicardable=[]
+        always_discardable=[]
 
         #search for the dead colors
         dead_color={}
