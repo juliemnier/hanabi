@@ -263,7 +263,7 @@ class MeilleureAI(AI):
                 deduction.pop(int(self.actions[(self.c_turn)%self.nb_joueurs][1])-1)
                 deduction.append([[1,2,3,4,5],list(hanabi.deck.Color)])
             if self.actions[(self.c_turn-1)%self.nb_joueurs][0]=='c':
-                for (i,card) in changed:
+                for (i,card) in enumerate(changed):
                     if card.number_clue:
                         deduction[i-1][0]=card.number_clue
                     if card.color_clue:
