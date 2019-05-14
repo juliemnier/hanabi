@@ -378,36 +378,37 @@ class MeilleureAI(AI):
 
                     count_color[indice][1]+=1
                 j_rank=0
-                j_color=0
+                j_color=count_color[0][0]
                 maxi_count=count_rank[0]
-                maxi_color=count_color[0][0]
-
-                for (i,sum) in enumerate(count_rank):
-                    if sum>=maxi_count:
-                        maxi_count=sum
+                maxi_color=count_color[0][1]
+                
+                for (i,summ) in enumerate(count_rank):
+                    if summ>=maxi_count:
+                        maxi_count=summ
                         j_rank=i
-                for (i,sum) in enumerate(count_color):
-                    if sum[1]>=maxi_color:
-                        maxi_color=sum[1]
-                        j_color=sum[0]
+                for (i,summ) in enumerate(count_color):
+                    if summ[1]>=maxi_color:
+                        maxi_color=summ[1]
+                        j_color=summ[0]
                 if maxi_count>=maxi_color and maxi_count>=2:
                     for p in self.other_hands[0].cards:
                         if p.number==j_rank:
                             self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
-                    self.actions[(self.c_turn)%self.nb_joueurs]= "c%d"%j_rank
-                    self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
-                    self.c_turn+=1
-                    return "c%d"%j_rank
+                            self.actions[(self.c_turn)%self.nb_joueurs]= "c%d"%j_rank
+                            self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
+                            self.c_turn+=1
+                            return "c%d"%j_rank
                 if maxi_count<maxi_color and maxi_color>=2:
                     for p in self.other_hands[0].cards:
-                        if p.color==j_color:
+                        if str(p.color)==j_color:
                             self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
-                    clue="c%s"%j_color
-                    clue=clue[:2]
-                    self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
-                    self.actions[(self.c_turn)%self.nb_joueurs]= clue
-                    self.c_turn+=1
-                    return clue
+                            clue="c%s"%p.color
+                            clue=clue[:2]
+                            self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
+                            self.actions[(self.c_turn)%self.nb_joueurs]= clue
+                            self.c_turn+=1
+                            return clue
+                
         #discard a card
         #if discardable:
          #   self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
