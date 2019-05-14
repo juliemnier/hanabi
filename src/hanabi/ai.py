@@ -279,6 +279,7 @@ class MeilleureAI(AI):
                 if len(changed)==1:
                     if changed[0][1].number_clue is False or changed[0][1].color_clue is False:
                         #play the card without question anyway
+                        self.list_deduction[(self.c_turn)%self.nb_joueurs]=deduction
                         self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
                         self.actions[(self.c_turn)%self.nb_joueurs]= "p%d"%changed[0][0]
                         self.c_turn+=1
