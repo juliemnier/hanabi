@@ -23,7 +23,7 @@ class MeilleureAI(AI):
         deduction=self.list_deduction[(self.c_turn)%self.nb_joueurs]
         changed=self.list_changed[(self.c_turn)%self.nb_joueurs]
 
-         #updating deduction with the card played in the player previous turn
+        #updating deduction with the card played in the player previous turn
 
         if self.c_turn<self.nb_joueurs:
             deduction=self.deduction()
@@ -101,12 +101,15 @@ class MeilleureAI(AI):
                             count_color+=1
                     if p[1].number_clue is False and count_rank==1:
                         self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
+                        self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
+                        self.actions[(self.c_turn)%self
                         self.actions[(self.c_turn)%self.nb_joueurs]= "c%d"%p[1].number
                         self.c_turn+=1
                         return "c%d"%p[1].number
                     if p[1].color_clue is False and count_color==1:
 			clue="c%s"%p[1].color
                         clue=clue[:2]
+                        self.list_changed[(self.c_turn)%self.nb_joueurs]=[]        
                         self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
                         self.actions[(self.c_turn)%self.nb_joueurs]= clue
                         self.c_turn=self.c_turn+1
@@ -115,6 +118,7 @@ class MeilleureAI(AI):
                     #when the clue to give is obvious
 
                     if p[1].number_clue is False and p[1].color_clue :
+                        self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
                         self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
                         self.actions[(self.c_turn)%self.nb_joueurs]= "c%d"%p[1].number
                         self.c_turn+=1
@@ -122,12 +126,13 @@ class MeilleureAI(AI):
                     if p[1].color_clue is False and p[1].number_clue :
                         clue="c%s"%p[1].color
                         clue=clue[:2]
+                        self.list_changed[(self.c_turn)%self.nb_joueurs]=[]        
                         self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
                         self.actions[(self.c_turn)%self.nb_joueurs]= clue
                         self.c_turn+=1
                         return clue
 
-            #intersections
+        #intersections
 
             if game.blue_coins>1:
                 count_rank=[0,0,0,0,0]
@@ -137,14 +142,55 @@ class MeilleureAI(AI):
                     count_rank[card.number]+=1
                     indice=0
                     for i in count_color:
+                        #peut etre str(card.color)
                         if card.color==count_color[i][0]:
                             indice=i
 
-                    count_color[indice]+=1
-                j=0
-                maxi=
-                best_rank=max(count_rank)
-                best_color=max(
+                    count_color[indice][1]+=1
+                j_rank=0
+                j_color=0
+                maxi_count=count_rank[0]
+                maxi_color=count_color[0][0]
+
+                for (i,sum) in enumerate(count_rank):
+                    if sum>=maxi_count:
+                        maxi_count=sum
+                        j_rank=i
+                for (i,sum) in enumerate(count_color):
+                    if sum[1]>=maxi_color:
+                        maxi_color=sum[1]
+                        j_color=sum[0]
+                if maxi_count>=maxi_color and maxi_count>=2:
+                    for p in self.other_hands[0].cards:
+                        if p.number==j_rank:
+                            self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
+                    self.actions[(self.c_turn)%self.nb_joueurs]= "c%d"%j_rank
+                    self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
+                    self.c_turn+=1
+                    return "c%d"%j_rank
+                if maxi_count<maxi_color and maxi_color>=2:
+                    for p in self.other_hands[0].cards:
+                        if p.color==j_color:
+                            self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
+                    clue="c%s"%j_color
+                    clue=clue[:2]
+                    self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
+                    self.actions[(self.c_turn)%self.nb_joueurs]= clue
+                    self.c_turn+=1
+                    return clue
+        #discard a card
+        if discardable:
+            self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
+            self.actions[(self.c_turn)%self.nb_joueurs]= "d%d"%discardable[0][0]
+            self.c_turn+=1
+            return "d%d"%discardable[0][0]
+
+        #last resort
+
+        self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
+        self.actions[(self.c_turn)%self.nb_joueurs]= "d%d"%discardable[0][0]
+        self.c_turn+=1
+        return "d%d"%5
 
 
 
