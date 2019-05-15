@@ -9,7 +9,7 @@ mean_red_coin=0
 lose=0
 for i in range (1000):
     game = hanabi.Game(2)
-    AI = ai.RandomPlaying(game)
+    AI = ai.MeilleureAI(game)
     game.ai = AI
     game.run()
     score.append(game.score)

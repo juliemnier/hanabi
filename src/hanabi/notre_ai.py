@@ -16,15 +16,13 @@ class MeilleureAI(AI):
     def play(self):
         """
         return the best action possible
-        """
-        
+        """  
         game = self.game
         #attention : à changer si on change always_playable(self)
         deduction=self.list_deduction[(self.c_turn)%self.nb_joueurs]
         changed=self.list_changed[(self.c_turn)%self.nb_joueurs]
 
         #updating deduction with the card played in the player previous turn
-
         if self.c_turn<self.nb_joueurs:
             deduction=self.deduction()
         else:
@@ -34,12 +32,11 @@ class MeilleureAI(AI):
             if self.actions[(self.c_turn-1)%self.nb_joueurs][0]=='c':
                 for (i,card) in changed:
                     if card.number_clue:
-                        deduction[i-1][0]=card.number_clue
+                        deduction[i-1][0]=[card.number]
                     if card.color_clue:
-                        deduction[i-1][1]=card.color_clue
+                        deduction[i-1][1]=[card.color]
 
-        #deductions : for now, the clue is only to be given to the next player.
-	
+        #deductions : for now, the clue is only to be given to the next player.	
         prev_action=self.actions[(self.c_turn-1)%self.nb_joueurs]
         liste_rank=list(game.piles.values())
         if prev_action:
@@ -48,15 +45,15 @@ class MeilleureAI(AI):
                 if len(changed)==1:
                     if changed[0][1].number_clue is False or changed[0][1].color_clue is False:
                         #play the card without question anyway
+                        self.list_deduction[(self.c_turn)%self.nb_joueurs]=deduction
                         self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
                         self.actions[(self.c_turn)%self.nb_joueurs]= "p%d"%changed[0][0]
                         self.c_turn+=1
-                        return "p%d"%changed[0][0]
-            
+                        return "p%d"%changed[0][0]    
                 elif prev_action[1].isdigit():
             	    #more than 2 cards have to be concerned
                     rk=int(prev_action[1])
-                    if list_rank.count((rk-1))!=0 and len(changed)<=list_rank.count(rk-1):
+                    if liste_rank.count((rk-1))!=0 and len(changed)<=liste_rank.count(rk-1):
                         color=[]
                         for i in range(5):
                             if liste_rank[i]==rk-1 : color.append(list(hanabi.deck.Color)[i])
@@ -160,17 +157,17 @@ class MeilleureAI(AI):
                         maxi_color=summ[1]
                         j_color=summ[0]
                 if maxi_count>=maxi_color and maxi_count>=2:
-                    for p in self.other_hands[0].cards:
+                    for (i,p) in enumerate(self.other_hands[0].cards):
                         if p.number==j_rank:
-                            self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
+                            self.list_changed[(self.c_turn+1)%self.nb_joueurs].append([i,p])
                             self.actions[(self.c_turn)%self.nb_joueurs]= "c%d"%j_rank
                             self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
                             self.c_turn+=1
                             return "c%d"%j_rank
                 if maxi_count<maxi_color and maxi_color>=2:
-                    for p in self.other_hands[0].cards:
+                    for (i,p) in enumerate(self.other_hands[0].cards):
                         if str(p.color)==j_color:
-                            self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
+                            self.list_changed[(self.c_turn+1)%self.nb_joueurs].append([i,p])
                             clue="c%s"%p.color
                             clue=clue[:2]
                             self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
@@ -225,7 +222,7 @@ class MeilleureAI(AI):
                         break
                 if play == False: break
             if play :
-                always_playable.append(game.current_hand.cards[i])
+                always_playable.append([i+1,game.current_hand.cards[i]])
             i+=1
         return always_playable
 
@@ -235,7 +232,7 @@ class MeilleureAI(AI):
         """
 
         game  = self.game
-        always_dicardable=[]
+        always_discardable=[]
 
         #search for the dead colors
         dead_color={}
