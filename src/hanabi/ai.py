@@ -247,15 +247,13 @@ class MeilleureAI(AI):
     def play(self):
         """
         return the best action possible
-        """
-        
+        """  
         game = self.game
         #attention : à changer si on change always_playable(self)
         deduction=self.list_deduction[(self.c_turn)%self.nb_joueurs]
         changed=self.list_changed[(self.c_turn)%self.nb_joueurs]
 
         #updating deduction with the card played in the player previous turn
-
         if self.c_turn<self.nb_joueurs:
             deduction=self.deduction()
         else:
@@ -263,14 +261,13 @@ class MeilleureAI(AI):
                 deduction.pop(int(self.actions[(self.c_turn)%self.nb_joueurs][1])-1)
                 deduction.append([[1,2,3,4,5],list(hanabi.deck.Color)])
             if self.actions[(self.c_turn-1)%self.nb_joueurs][0]=='c':
-                for (i,card) in enumerate(changed):
+                for (i,card) in changed:
                     if card.number_clue:
                         deduction[i-1][0]=card.number_clue
                     if card.color_clue:
                         deduction[i-1][1]=card.color_clue
 
-        #deductions : for now, the clue is only to be given to the next player.
-	
+        #deductions : for now, the clue is only to be given to the next player.	
         prev_action=self.actions[(self.c_turn-1)%self.nb_joueurs]
         liste_rank=list(game.piles.values())
         if prev_action:
@@ -279,12 +276,10 @@ class MeilleureAI(AI):
                 if len(changed)==1:
                     if changed[0][1].number_clue is False or changed[0][1].color_clue is False:
                         #play the card without question anyway
-                        self.list_deduction[(self.c_turn)%self.nb_joueurs]=deduction
                         self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
                         self.actions[(self.c_turn)%self.nb_joueurs]= "p%d"%changed[0][0]
                         self.c_turn+=1
-                        return "p%d"%changed[0][0]
-            
+                        return "p%d"%changed[0][0]    
                 elif prev_action[1].isdigit():
             	    #more than 2 cards have to be concerned
                     rk=int(prev_action[1])
@@ -298,7 +293,7 @@ class MeilleureAI(AI):
 
         self.list_deduction[(self.c_turn)%self.nb_joueurs]=deduction
         playable=self.always_playable(deduction)
-        #discardable=self.always_discardable(game.current_hand)
+        discardable=self.always_discardable(deduction)
 
         #if a card can be played
 
@@ -373,7 +368,7 @@ class MeilleureAI(AI):
                     count_rank[card.number-1]+=1
                     indice=0
                     for (i,liste) in enumerate(count_color):
-                        #peut etre str(card.color)
+                        #peut etre str(card.color) indeed
                         if str(card.color)==count_color[i][0]:
                             indice=i
 
@@ -382,7 +377,7 @@ class MeilleureAI(AI):
                 j_color=count_color[0][0]
                 maxi_count=count_rank[0]
                 maxi_color=count_color[0][1]
-                
+
                 for (i,summ) in enumerate(count_rank):
                     if summ>=maxi_count:
                         maxi_count=summ
@@ -409,13 +404,12 @@ class MeilleureAI(AI):
                             self.actions[(self.c_turn)%self.nb_joueurs]= clue
                             self.c_turn+=1
                             return clue
-                
         #discard a card
-        #if discardable:
-         #   self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
-          #  self.actions[(self.c_turn)%self.nb_joueurs]= "d%d"%discardable[0][0]
-           # self.c_turn+=1
-            #return "d%d"%discardable[0][0]
+        if discardable:
+            self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
+            self.actions[(self.c_turn)%self.nb_joueurs]= "d%d"%discardable[0][0]
+            self.c_turn+=1
+            return "d%d"%discardable[0][0]
 
         #last resort
 
@@ -462,14 +456,13 @@ class MeilleureAI(AI):
             i+=1
         return always_playable
 
-
     def always_discardable(self,deduction): #with game.current_hand
         """
         gives a list of cards that are always discardable however the current/other players are playing/deducting
         """
 
         game  = self.game
-        always_discardable=[]
+        always_dicardable=[]
 
         #search for the dead colors
         dead_color={}
@@ -481,7 +474,7 @@ class MeilleureAI(AI):
             if 0 in L:
                 dead_color[color]=L.index(0)
 
-                #search for the cards which are discardable
+        #search for the cards which are discardable
         i=0
         for card in deduction:
             discard=True
@@ -498,7 +491,6 @@ class MeilleureAI(AI):
             i+=1
         return always_discardable
 
-       
      
 
     #see if we find anything else
@@ -582,8 +574,3 @@ class MeilleureAI(AI):
                     deduction[i][0].remove(j)
         return deduction
     
-
-
-
-
-

@@ -66,7 +66,7 @@ class MeilleureAI(AI):
 
         self.list_deduction[(self.c_turn)%self.nb_joueurs]=deduction
         playable=self.always_playable(deduction)
-        discardable=self.always_discardable(game.current_hand)
+        discardable=self.always_discardable(deduction)
 
         #if a card can be played
 
@@ -229,51 +229,40 @@ class MeilleureAI(AI):
             i+=1
         return always_playable
 
-    def always_discardable(self,hand): #with game.current_hand
+    def always_discardable(self,deduction): #with game.current_hand
         """
         gives a list of cards that are always discardable however the current/other players are playing/deducting
         """
 
-        game = self.game
-        always_discardable=[]
+        game  = self.game
+        always_dicardable=[]
 
-        #spotting the cards for which we have two clues then filter
-        for (i,card) in enumerate(hand.cards):
-            if card.color_clue and card.number_clue :
-		#checking if discardable
-                if game.piles[card.color]>=card.number :
-                    alway_discardable.append([i+1,card])
-                if card in self.other_players_cards :
-                    #voir si on garde dans discardable
-                    alway_discardable.append([i+1,card])
-
-
-        #if every rank in the piles is above the rank of one of our card : with one clue only
-
-        liste_rank=list(game.piles.values())
-        for (i,card) in enumerate(hand.cards):
-            discardable=True
-            if card.number_clue: #not necessary but more visible
-                for rank in liste_rank:
-                    if card.number_clue>rank:
-                        discardable=False
-                if discardable:
-                    alway_discardable.append([i+1,card])
-
-            if game.piles[card.color_clue]==5:
-                alway_discardable.append([i+1,card])
-
-        #if the color itself is discardable because all the cards of a rank above the rank of the pile have already been played/discarded
-
+        #search for the dead colors
+        dead_color={}
         colorIds={'Red' : 0,'Blue' : 1,'Green' : 2,'White' : 3,'Yellow' : 4}
         counter=self.counter()
-        for (i,card) in enumerate(hand.cards):
-            if card.color_clue:
-                #picking the list corresponding to the card's color
-                count= counter[colorIds[str(card.color_clue)]]
-                for remaining in count:
-                 #   if remaining==0 and ####TO BE CONTINUED
-                        alway_discardable.append([i+1,card])
+        for color in list(hanabi.deck.Color):
+            tmp=colorIds[str(color)]
+            L=counter[tmp]
+            if 0 in L:
+                dead_color[color]=L.index(0)
+
+        #search for the cards which are discardable
+        i=0
+        for card in deduction:
+            discard=True
+            for rank in card[0]:
+                for color in card[1]:
+                    if game.piles[color]<rank:
+                        discard=False
+                        if (color in list(dead_color.keys()) and rank>dead_color.get(color)):
+                            discard=True
+                    if discard == False: break
+                if discard == False: break
+            if discard :
+                always_discardable.append([i+1,game.current_hand.cards[i]])
+            i+=1
+        return always_discardable
 
      
 
