@@ -390,21 +390,21 @@ class MeilleureAI(AI):
                 if maxi_count>=maxi_color and maxi_count>=2:
                     for (i,p) in enumerate(self.other_hands[0].cards):
                         if p.number==j_rank:
-                            self.list_changed[(self.c_turn+1)%self.nb_joueurs].append([i,p])
-                            self.actions[(self.c_turn)%self.nb_joueurs]= "c%d"%j_rank
-                            self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
-                            self.c_turn+=1
-                            return "c%d"%j_rank
+                            self.list_changed[(self.c_turn+1)%self.nb_joueurs].append([i+1,p])
+                    self.actions[(self.c_turn)%self.nb_joueurs]= "c%d"%j_rank
+                    self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
+                    self.c_turn+=1
+                    return "c%d"%j_rank
                 if maxi_count<maxi_color and maxi_color>=2:
                     for (i,p) in enumerate(self.other_hands[0].cards):
                         if str(p.color)==j_color:
-                            self.list_changed[(self.c_turn+1)%self.nb_joueurs].append([i,p])
+                            self.list_changed[(self.c_turn+1)%self.nb_joueurs].append([i+1,p])
                             clue="c%s"%p.color
                             clue=clue[:2]
-                            self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
-                            self.actions[(self.c_turn)%self.nb_joueurs]= clue
-                            self.c_turn+=1
-                            return clue
+                    self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
+                    self.actions[(self.c_turn)%self.nb_joueurs]= clue
+                    self.c_turn+=1
+                    return clue
         #discard a card
         if discardable:
             self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
