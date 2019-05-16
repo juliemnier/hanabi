@@ -45,30 +45,6 @@ class MeilleureAI(AI):
             #voir si on rajoute les priorités
             return "p%d"%playable[0][0]
 
-        #intersection
-
-        if game.blue_coins>2:
-            m=0
-            i=0
-            for color in list(hanabi.deck.Color):
-                for card in other_hands[1].cards:
-                    if card.color == color :
-                        i+=1
-                if i>m:
-                    m=i
-                    association=color
-            for rank in [1,2,3,4,5]:
-                for card in other_hands[1].cards:
-                    if card.number == rank :
-                        i+=1
-                if i>m:
-                    m=i
-                    association=rank
-                    t=True
-            if t:
-                
-                
-
 
 
 

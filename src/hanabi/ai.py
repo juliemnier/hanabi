@@ -17,7 +17,6 @@ class AI:
         self.list_deduction=[[] for i in range(self.nb_joueurs)] #A list of lists deductions (cf self.deduction) 
         self.actions=[[] for i in range(self.nb_joueurs)] #A list with the memory of the previous actions for each player.[action]
         self.list_changed=[[] for i in range(self.nb_joueurs)] #A list with the memory of the card which have changed for each player during the turn of another player.[[[index of the card,card changed]]]
-        self.B=[]
     
         
     @property
@@ -312,38 +311,14 @@ class MeilleureAI(AI):
         if game.blue_coins>0:
 
             interesting=[]
-            practical=[[],[]]
             #voir ligne 355 deck
 
             for (i,card) in enumerate(self.other_hands[0].cards):
                 if game.piles[card.color]+1 == card.number:
                     interesting.append([i+1,card])
-                    practical[0].append(card.number)
-                    practical[1].append(card.color)
+
 
             if interesting:
-                A=[0,0,0,0,0]
-                self.B=[[],[],[],[],[]]
-                C=[[],[],[],[],[]]
-                for (i,j) in enumerate(practical[0]):
-                    test_color=True
-                    if self.B[j-1]:
-                        for k in self.B[j-1]:
-                            if practical[1][k]==practical[1][i]:
-                                test_color=False
-                                break
-                    if test_color:
-                        A[j-1]+=1
-                        self.B[j-1].append(i)
-                        C[j-1].append(interesting[i])
-                if (A.count(0)+A.count(1))<5:
-                    i=A.index(max(A))
-                    for p in C[i]:
-                        self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
-                    self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
-                    self.actions[(self.c_turn)%self.nb_joueurs]= "c%d"%C[i][0][1].number
-                    self.c_turn+=1
-                    return "c%d"%C[i][0][1].number
                 for p in interesting:
                     count_rank=0
                     count_color=0
