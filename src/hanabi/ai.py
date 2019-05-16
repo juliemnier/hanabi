@@ -418,18 +418,21 @@ class MeilleureAI(AI):
 
         #last resort
 
-        for (i,card) in enumerate(game.current_hand.cards):
-            if not card.number_clue or not card.color_clue:
-                self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
-                self.actions[(self.c_turn)%self.nb_joueurs]= "d%d"%(i+1)
-                self.c_turn+=1
-                return "d%d"%(i+1)
+        if game.blue_coins<8:
+            for (i,card) in enumerate(game.current_hand.cards):
+                if not card.number_clue or not card.color_clue:
+                    self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
+                    self.actions[(self.c_turn)%self.nb_joueurs]= "d%d"%(i+1)
+                    self.c_turn+=1
+                    return "d%d"%(i+1)
 
 
-        self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
-        self.actions[(self.c_turn)%self.nb_joueurs]= "d%d"%discardable[0][0]
-        self.c_turn+=1
-        return "d%d"%5
+            self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
+            self.actions[(self.c_turn)%self.nb_joueurs]= "d%d"%discardable[0][0]
+            self.c_turn+=1
+            return "d%d"%5
+        if game.blue_coins==8:
+            return 'cw' #will clue randomly
 
 
 
