@@ -362,31 +362,35 @@ class MeilleureAI(AI):
         #intersections
 
             if game.blue_coins>1:
-                count_rank=[0,0,0,0,0]
-                count_color=[['Red',0],['Blue',0],['Green',0],['White',0],['Yellow',0]]
+                count_rank=[[0,0],[0,0],[0,0],[0,0]]
+                count_color=[['Red',0,0],['Blue',0,0],['Green',0,0],['White',0,0],['Yellow',0,0]]
 
                 for card in self.other_hands[0].cards:
-                    count_rank[card.number-1]+=1
+                    count_rank[card.number-1][0]+=1
+                    if card.number_clue:
+                        count_rank[card.number-1][1]+=1
                     indice=0
                     for (i,liste) in enumerate(count_color):
-                        #peut etre str(card.color) indeed
                         if str(card.color)==count_color[i][0]:
                             indice=i
 
                     count_color[indice][1]+=1
+                    if card.color_clue:
+                        count_color[indice][2]+=1
                 j_rank=1
                 j_color=count_color[0][0]
-                maxi_count=count_rank[0]
-                maxi_color=count_color[0][1]
+                maxi_count=count_rank[0][0]-count_rank[0][1]
+                maxi_color=count_color[0][1]-count_color[0][2]
 
                 for (i,summ) in enumerate(count_rank):
-                    if summ>=maxi_count:
-                        maxi_count=summ
+                    if (summ[0]-summ[1])>=maxi_count:
+                        maxi_count=summ[0]-summ[1]
                         j_rank=i+1
                 for (i,summ) in enumerate(count_color):
-                    if summ[1]>=maxi_color:
-                        maxi_color=summ[1]
-                        j_color=summ[0]
+                    if (summ[1]-summ[2])>=maxi_color:
+                        maxi_color=summ[1]-summ[2]
+                        j_color=summ[0] 
+                        
                 if maxi_count>=maxi_color and maxi_count>=2:
                     for (i,p) in enumerate(self.other_hands[0].cards):
                         if p.number==j_rank:
