@@ -76,18 +76,39 @@ class MeilleureAI(AI):
 
 
         #beginning the strategy
-
         if game.blue_coins>0:
-
             interesting=[]
+            practical=[[],[]]
             #voir ligne 355 deck
-
             for (i,card) in enumerate(self.other_hands[0].cards):
                 if game.piles[card.color]+1 == card.number:
                     interesting.append([i+1,card])
-
+                    practical[0].append(card.number)
+                    practical[1].append(card.color)
 
             if interesting:
+                A=[0,0,0,0,0]
+                B=[[],[],[],[],[]]
+                C=[[],[],[],[],[]]
+                for (i,j) in enumerate(practical[0]):
+                    test_color=True
+                    if B[j-1]:
+                        for k in B[j-1]:
+                            if practical[1][k]==practical[1][i]:
+                                test_color=False
+                                break
+                    if test_color:
+                        A[j-1]+=1
+                        B[j-1].append(interesting[i][0])
+                        C[j-1].append(interesting[i])
+                if (A.count(0)+A.count(1))<5:
+                    i=A.index(max(A))
+                    for p in C[i]:
+                        self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
+                    self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
+                    self.actions[(self.c_turn)%self.nb_joueurs]= "c%d"%C[0][1].number
+                    self.c_turn+=1
+                    return "c%d"%C[0][1].number
                 for p in interesting:
                     count_rank=0
                     count_color=0
@@ -105,7 +126,7 @@ class MeilleureAI(AI):
                     if p[1].color_clue is False and count_color==1:
                         clue="c%s"%p[1].color
                         clue=clue[:2]
-                        self.list_changed[(self.c_turn)%self.nb_joueurs]=[]        
+                        self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
                         self.list_changed[(self.c_turn+1)%self.nb_joueurs].append(p)
                         self.actions[(self.c_turn)%self.nb_joueurs]= clue
                         self.c_turn=self.c_turn+1
@@ -129,7 +150,6 @@ class MeilleureAI(AI):
                         return clue
 
         #intersections
-
             if game.blue_coins>1:
                 count_rank=[0,0,0,0,0]
                 count_color=[['Red',0],['Blue',0],['Green',0],['White',0],['Yellow',0]]
@@ -196,12 +216,6 @@ class MeilleureAI(AI):
         self.c_turn+=1
         return "d%d"%5
 
-
-
-
-
-
-
     def always_playable(self,deduction): 
 
         """
@@ -261,8 +275,6 @@ class MeilleureAI(AI):
             i+=1
         return always_discardable
 
-     
-
     #see if we find anything else
     def counter(self):
         """
@@ -297,8 +309,6 @@ class MeilleureAI(AI):
 
         return count
 
-
-    
     def deduction(self):
         "deduct new clues from the others"
         game = self.game
