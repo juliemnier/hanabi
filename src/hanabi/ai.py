@@ -362,7 +362,7 @@ class MeilleureAI(AI):
         #intersections
 
             if game.blue_coins>1:
-                count_rank=[[0,0],[0,0],[0,0],[0,0]]
+                count_rank=[[0,0],[0,0],[0,0],[0,0],[0,0]]
                 count_color=[['Red',0,0],['Blue',0,0],['Green',0,0],['White',0,0],['Yellow',0,0]]
 
                 for card in self.other_hands[0].cards:
@@ -389,8 +389,8 @@ class MeilleureAI(AI):
                 for (i,summ) in enumerate(count_color):
                     if (summ[1]-summ[2])>=maxi_color:
                         maxi_color=summ[1]-summ[2]
-                        j_color=summ[0] 
-                        
+                        j_color=summ[0]
+
                 if maxi_count>=maxi_color and maxi_count>=2:
                     for (i,p) in enumerate(self.other_hands[0].cards):
                         if p.number==j_rank:
@@ -399,7 +399,7 @@ class MeilleureAI(AI):
                     self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
                     self.c_turn+=1
                     return "c%d"%j_rank
-                if maxi_count<maxi_color and maxi_color>=2:
+                elif maxi_count<maxi_color and maxi_color>=2:
                     for (i,p) in enumerate(self.other_hands[0].cards):
                         if str(p.color)==j_color:
                             self.list_changed[(self.c_turn+1)%self.nb_joueurs].append([i+1,p])
