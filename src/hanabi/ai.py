@@ -290,7 +290,7 @@ class MeilleureAI(AI):
                             if liste_rank[i]==rk-1 : color.append(list(hanabi.deck.Color)[i])
                         for (i,card) in changed:
 			    #update deduction then playable does the rest
-                            deduction[i][1]=color
+                            deduction[i-1][1]=color
 
         self.list_deduction[(self.c_turn)%self.nb_joueurs]=deduction
         playable=self.always_playable(deduction)
