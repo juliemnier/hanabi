@@ -281,16 +281,6 @@ class MeilleureAI(AI):
                         self.actions[(self.c_turn)%self.nb_joueurs]= "p%d"%changed[0][0]
                         self.c_turn+=1
                         return "p%d"%changed[0][0]    
-                elif prev_action[1].isdigit():
-            	    #more than 2 cards have to be concerned
-                    rk=int(prev_action[1])
-                    if liste_rank.count((rk-1))!=0 and len(changed)<=liste_rank.count(rk-1):
-                        color=[]
-                        for i in range(5):
-                            if liste_rank[i]==rk-1 : color.append(list(hanabi.deck.Color)[i])
-                        for (i,card) in changed:
-			    #update deduction then playable does the rest
-                            deduction[i-1][1]=color
 
         self.list_deduction[(self.c_turn)%self.nb_joueurs]=deduction
         playable=self.always_playable(deduction)

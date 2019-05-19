@@ -24,5 +24,5 @@ mean_red_coin/=1000
 print("Le max est",max(score),".")
 print("Le min est",min(score),".")
 print("Le score moyen est",mean,".")
-print("L'IA à perdu ",lose," fois.")
+print("L'IA a perdu ",lose," fois.")
 print("Ils restaient en moyenne",3-mean_red_coin,"jeton(s) rouge(s).")
