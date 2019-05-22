@@ -249,7 +249,6 @@ class MeilleureAI(AI):
         return the best action possible
         """  
         game = self.game
-        #attention : à changer si on change always_playable(self)
         deduction=self.list_deduction[(self.c_turn)%self.nb_joueurs]
         changed=self.list_changed[(self.c_turn)%self.nb_joueurs]
 
@@ -270,11 +269,13 @@ class MeilleureAI(AI):
         #deductions : for now, the clue is only to be given to the next player.	
         prev_action=self.actions[(self.c_turn-1)%self.nb_joueurs]
         liste_rank=list(game.piles.values())
+
         if prev_action:
             if (prev_action[0]=='c'):
                	#if only one card is concerned (cf. strategy)
                 if len(changed)==1:
                     if changed[0][1].number_clue is False or changed[0][1].color_clue is False:
+
                         #play the card without question anyway
                         self.list_deduction[(self.c_turn)%self.nb_joueurs]=deduction
                         self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
@@ -289,7 +290,6 @@ class MeilleureAI(AI):
         #if a card can be played
 
         if playable:
-            #voir si on rajoute les priorités
             self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
             self.actions[(self.c_turn)%self.nb_joueurs]= "p%d"%playable[0][0]
             self.c_turn+=1
@@ -301,7 +301,6 @@ class MeilleureAI(AI):
         if game.blue_coins>0:
 
             interesting=[]
-            #voir ligne 355 deck
 
             for (i,card) in enumerate(self.other_hands[0].cards):
                 if game.piles[card.color]+1 == card.number:
@@ -312,6 +311,7 @@ class MeilleureAI(AI):
                 for p in interesting:
                     count_rank=0
                     count_color=0
+                    #when a clue that meets the conditions of our strategy can be given
                     for card in self.other_hands[0].cards:
                         if card.number==p[1].number:
                             count_rank+=1
@@ -349,7 +349,7 @@ class MeilleureAI(AI):
                         self.c_turn+=1
                         return clue
 
-        #intersections
+        #intersections : to maximize the number of cards concerned by the clue
 
             if game.blue_coins>1:
                 count_rank=[[0,0],[0,0],[0,0],[0,0],[0,0]]
@@ -406,11 +406,17 @@ class MeilleureAI(AI):
             self.c_turn+=1
             return "d%d"%discardable[0][0]
 
-        #last resort
+        #last resort : gives up a card with no more than 1 clue
+	
 
         if game.blue_coins<8:
             for (i,card) in enumerate(game.current_hand.cards):
-                if not card.number_clue or not card.color_clue:
+                if not card.number_clue and not card.color_clue:
+                    self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
+                    self.actions[(self.c_turn)%self.nb_joueurs]= "d%d"%(i+1)
+                    self.c_turn+=1
+                    return "d%d"%(i+1)
+                elif not card.number_clue or not card.color_clue:
                     self.list_changed[(self.c_turn)%self.nb_joueurs]=[]
                     self.actions[(self.c_turn)%self.nb_joueurs]= "d%d"%(i+1)
                     self.c_turn+=1
